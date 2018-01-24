@@ -1,0 +1,23 @@
+{
+  "name": "codepeak/magento2-optimize",
+  "description": "",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "email": "robert@codepeak.se",
+      "name": "Robert Lord, Codepeak AB"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "codepeak/magento2-core": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Codepeak\\Optimize\\": ""
+    },
+    "files": [
+      "registration.php"
+    ]
+  }
+}
