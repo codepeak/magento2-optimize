@@ -23,7 +23,7 @@ namespace Codepeak\Optimize\Cron;
 
 use Codepeak\Core\Logger\Logger;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use     \Magento\Framework\App\ResourceConnection;
+use Magento\Framework\App\ResourceConnection;
 
 /**
  * Class Sessions
@@ -75,7 +75,7 @@ class Sessions
     /**
      * Execute the cron
      *
-     * @return void
+     * @throws \Zend_Db_Statement_Exception
      */
     public function execute()
     {
