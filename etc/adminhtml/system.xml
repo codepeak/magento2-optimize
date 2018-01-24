@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="optimize" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
+        <section id="codepeak_optimize" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
             <label>Optimize</label>
             <tab>codepeak</tab>
             <resource>Codepeak_Optimize::config_codepeak_optimize</resource>
-            <group id="session" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
+            <group id="session" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="10" translate="label">
                 <label>Session</label>
                 <field id="enabled" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="10" translate="label" type="select">
                     <label>Enable</label>
@@ -15,6 +15,10 @@
                 <field id="expiry_limit" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="20" translate="label" type="text">
                     <label>Expiry limit</label>
                     <comment>How many extra days to keep an expired session when keeping them in the database</comment>
+                </field>
+                <field id="delete_limit" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="20" translate="label" type="text">
+                    <label>Delete limit</label>
+                    <comment>How many entries to delete on each run. Method is executed every other hour.</comment>
                 </field>
             </group>
         </section>

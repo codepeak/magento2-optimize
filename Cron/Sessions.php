@@ -21,16 +21,57 @@
 
 namespace Codepeak\Optimize\Cron;
 
+use Codepeak\Core\Logger\Logger;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use     \Magento\Framework\App\ResourceConnection;
+
 /**
  * Class Sessions
  *
  * @package  Codepeak\Optimize\Cron
- * @license  MIT License https://opensource.org/licenses/MIT
+ * @license  GNU License http://www.gnu.org/licenses/
  * @author   Robert Lord, Codepeak AB <robert@codepeak.se>
  * @link     https://codepeak.se
  */
 class Sessions
 {
+    /**
+     * @var
+     */
+    const DELETE_LIMIT = 1000;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
+     * @var ResourceConnection
+     */
+    protected $resourceConnection;
+
+    /**
+     * Sessions constructor.
+     *
+     * @param Logger               $logger
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ResourceConnection   $resourceConnection
+     */
+    public function __construct(
+        Logger $logger,
+        ScopeConfigInterface $scopeConfig,
+        ResourceConnection $resourceConnection
+    ) {
+        $this->logger = $logger;
+        $this->scopeConfig = $scopeConfig;
+        $this->resourceConnection = $resourceConnection;
+    }
+
     /**
      * Execute the cron
      *
@@ -38,6 +79,55 @@ class Sessions
      */
     public function execute()
     {
-        // Do the magic clean up here
+        // Make sure function is enabled
+        if ($this->scopeConfig->getValue('codepeak_optimize/session/enabled') == '1') {
+            // Fetch the expiry limit
+            $expiryLimit = intval($this->scopeConfig->getValue('codepeak_optimize/session/expiry_limit'));
+
+            // Fetch the delete limit
+            $deleteLimit = intval($this->scopeConfig->getValue('codepeak_optimize/session/delete_limit'));
+
+            // Set default value if nothing was given
+            if (!$deleteLimit) {
+                $deleteLimit = 1000;
+            }
+
+            // Make a note in the log about this
+            $this->logger->info('Looking for expired sessions with an additional ' . $expiryLimit . ' days...');
+
+            // Calculate the expiry limit in unix timestamp
+            $expiryLimit = time() - ($expiryLimit * 86400);
+
+            // Fetch the table name
+            $sessionTableName = $this->resourceConnection->getTableName('session');
+
+            // Setup the count SQL
+            $sqlCount = 'SELECT COUNT(*) as `count` FROM `%s` WHERE `session_expires` <= %s LIMIT ' . $deleteLimit;
+            $sqlCount = sprintf(
+                $sqlCount,
+                $sessionTableName,
+                $expiryLimit
+            );
+
+            // Setup the removal SQL
+            $sqlRemove = 'DELETE FROM `%s` WHERE `session_expires` <= %s LIMIT ' . $deleteLimit;
+            $sqlRemove = sprintf(
+                $sqlRemove,
+                $sessionTableName,
+                $expiryLimit
+            );
+
+            // Fetch a database connection
+            $connection = $this->resourceConnection->getConnection();
+
+            // Count the number of items to be removed
+            $removalCount = intval($connection->query($sqlCount)->fetchColumn(0));
+
+            // Remove the sessions
+            $connection->query($sqlRemove);
+
+            // Make a note in the log about this
+            $this->logger->info('Finished cleaning up. Removed ' . $removalCount . ' expired sessions');
+        }
     }
 }

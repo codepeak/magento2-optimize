@@ -1,10 +1,11 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
-        <optimize>
+        <codepeak_optimize>
             <session>
                 <expiry_limit>14</expiry_limit>
+                <delete_limit>1000</delete_limit>
             </session>
-        </optimize>
+        </codepeak_optimize>
     </default>
 </config>
